@@ -7,7 +7,7 @@ import org.researchstack.backbone.StorageAccess;
 import org.researchstack.backbone.ui.PinCodeActivity;
 import org.researchstack.backbone.utils.ObservableUtils;
 import org.researchstack.skin.AppPrefs;
-import org.researchstack.skin.DataProvider;
+import org.researchstack.backbone.DataProvider;
 import org.researchstack.skin.notification.TaskAlertReceiver;
 
 
@@ -28,7 +28,7 @@ public class SplashActivity extends PinCodeActivity {
                 .compose(ObservableUtils.applyDefault())
                 .subscribe(response -> {
 
-                    if (AppPrefs.getInstance(this).isOnboardingComplete() ||
+                    if(AppPrefs.getInstance().isOnboardingComplete() ||
                             DataProvider.getInstance().isSignedIn(this)) {
                         launchMainActivity();
                     } else {
@@ -58,7 +58,7 @@ public class SplashActivity extends PinCodeActivity {
     protected void launchOnboardingActivity() {
         // TODO: this shouldnt be hardcoded
         // TODO: consider an OnboardingManager class like iOS
-        startActivity(new Intent(this, OnboardingActivity.class));
+        startActivity(new Intent(this, OverviewActivity.class));
     }
 
     protected void launchMainActivity() {

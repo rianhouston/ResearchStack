@@ -1,5 +1,4 @@
 package org.researchstack.skin.ui;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +19,7 @@ import org.researchstack.backbone.ui.ViewTaskActivity;
 import org.researchstack.backbone.utils.LogExt;
 import org.researchstack.backbone.utils.ObservableUtils;
 import org.researchstack.skin.AppPrefs;
-import org.researchstack.skin.DataProvider;
+import org.researchstack.backbone.DataProvider;
 import org.researchstack.skin.R;
 import org.researchstack.skin.TaskProvider;
 import org.researchstack.skin.task.OnboardingTask;
@@ -30,14 +29,38 @@ import org.researchstack.skin.ui.layout.SignUpEligibleStepLayout;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class BaseActivity extends PinCodeActivity {
+public class BaseActivity extends PinCodeActivity
+{
 
-    BroadcastReceiver errorBroadcastReceiver = new BroadcastReceiver() {
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        IntentFilter errorFilter = new IntentFilter();
+        errorFilter.addAction(DataProvider.ERROR_CONSENT_REQUIRED);
+        errorFilter.addAction(DataProvider.ERROR_NOT_AUTHENTICATED);
+
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(errorBroadcastReceiver, errorFilter);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(errorBroadcastReceiver);
+    }
+
+    BroadcastReceiver errorBroadcastReceiver = new BroadcastReceiver()
+    {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent)
+        {
             LogExt.i(getClass(), "errorBroadcastReceiver()");
 
-            if (AppPrefs.getInstance(context).skippedOnboarding()) {
+            if(AppPrefs.getInstance().skippedOnboarding())
+            {
                 // We don't want to bother a user that has skipped sign-up with the signed out
                 // or consent messages. Short-circuiting until we have an approved message to show
                 // a user that has skipped.
@@ -48,7 +71,8 @@ public class BaseActivity extends PinCodeActivity {
             int length = Snackbar.LENGTH_INDEFINITE;
             Action1<View> action = null;
 
-            switch (intent.getAction()) {
+            switch(intent.getAction())
+            {
                 case DataProvider.ERROR_CONSENT_REQUIRED:
                     messageText = getString(R.string.rss_network_error_consent);
                     actionText = getString(R.string.rss_network_error_consent_action);
@@ -69,7 +93,7 @@ public class BaseActivity extends PinCodeActivity {
                                 .get(TaskProvider.TASK_ID_SIGN_IN);
                         task.setHasPasscode(hasPinCode);
                         startActivityForResult(SignUpTaskActivity.newIntent(BaseActivity.this,
-                                task), OnboardingActivity.REQUEST_CODE_SIGN_IN);
+                                                                            task), OverviewActivity.REQUEST_CODE_SIGN_IN);
                     };
                     break;
             }
@@ -77,14 +101,16 @@ public class BaseActivity extends PinCodeActivity {
             // Throw up a Snackbar
             View root = findViewById(android.R.id.content);
             Snackbar snackbar = Snackbar.make(root, messageText, length);
-            if (action != null) {
-                snackbar.setAction(actionText, action::call);
+            if(action != null)
+            {
+                snackbar.setAction(actionText, action:: call);
             }
             snackbar.getView().setOnClickListener(v -> snackbar.dismiss());
             snackbar.setActionTextColor(ContextCompat.getColor(BaseActivity.this,
-                    R.color.rss_snackbar_action_color));
+                                                               R.color.rss_snackbar_action_color));
             TextView messageView = getSnackBarMessageView(snackbar);
-            if (messageView != null) {
+            if (messageView != null)
+            {
                 messageView.setTextColor(Color.WHITE);
             }
 
@@ -92,41 +118,25 @@ public class BaseActivity extends PinCodeActivity {
         }
     };
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        IntentFilter errorFilter = new IntentFilter();
-        errorFilter.addAction(DataProvider.ERROR_CONSENT_REQUIRED);
-        errorFilter.addAction(DataProvider.ERROR_NOT_AUTHENTICATED);
-
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(errorBroadcastReceiver, errorFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(errorBroadcastReceiver);
-    }
-
     /**
      * Method is not safe and assumes tv-id or tv-index wont change.
-     *
      * @return Snackbar message TextView
      */
-    private TextView getSnackBarMessageView(Snackbar snackbar) {
+    private TextView getSnackBarMessageView(Snackbar snackbar)
+    {
         // Try id for app level snackbar id
         int id = org.researchstack.skin.R.id.snackbar_text;
         TextView tv = (TextView) snackbar.getView().findViewById(id);
-        if (tv != null) {
+        if (tv != null)
+        {
             return tv;
         }
 
         // Try id for lib level snackbar id
         id = android.support.design.R.id.snackbar_text;
         tv = (TextView) snackbar.getView().findViewById(id);
-        if (tv != null) {
+        if (tv != null)
+        {
             return tv;
         }
 
@@ -134,7 +144,8 @@ public class BaseActivity extends PinCodeActivity {
         // action is a Button who's super-type is also TextView.
         ViewGroup snackBarContainer = (ViewGroup) snackbar.getView();
         View childZero = snackBarContainer.getChildAt(0);
-        if (childZero.getClass() == TextView.class) {
+        if (childZero.getClass() == TextView.class)
+        {
             return (TextView) childZero;
         }
 
@@ -142,21 +153,26 @@ public class BaseActivity extends PinCodeActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OnboardingActivity.REQUEST_CODE_SIGN_IN && resultCode == RESULT_OK) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode == OverviewActivity.REQUEST_CODE_SIGN_IN && resultCode == RESULT_OK)
+        {
             TaskResult result = (TaskResult) data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT);
             String email = (String) result.getStepResult(OnboardingTask.SignInStepIdentifier)
                     .getResultForIdentifier(SignInTask.ID_EMAIL);
             String password = (String) result.getStepResult(OnboardingTask.SignInStepIdentifier)
                     .getResultForIdentifier(SignInTask.ID_PASSWORD);
 
-            if (email != null && password != null) {
+            if(email != null && password != null)
+            {
                 Intent intent = new Intent(this, EmailVerificationActivity.class);
                 intent.putExtra(EmailVerificationActivity.EXTRA_EMAIL, email);
                 intent.putExtra(EmailVerificationActivity.EXTRA_PASSWORD, password);
                 startActivity(intent);
             }
-        } else if (requestCode == SignUpEligibleStepLayout.CONSENT_REQUEST && resultCode == RESULT_OK) {
+        }
+        else if(requestCode == SignUpEligibleStepLayout.CONSENT_REQUEST && resultCode == RESULT_OK)
+        {
             TaskResult consentResult = (TaskResult) data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT);
 
             Observable.fromCallable(() -> {
@@ -164,7 +180,9 @@ public class BaseActivity extends PinCodeActivity {
                 DataProvider.getInstance().uploadConsent(this, consentResult);
                 return null;
             }).compose(ObservableUtils.applyDefault()).subscribe();
-        } else {
+        }
+        else
+        {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

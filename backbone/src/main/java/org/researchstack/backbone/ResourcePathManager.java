@@ -28,6 +28,8 @@ import java.nio.charset.Charset;
  * ResearchKit™ applications
  */
 public abstract class ResourcePathManager {
+    // TODO: if we are going to go with a singleton instance of Gson,
+    // TODO: we need a simple way to inject type adapters into it - MDP 1/13/2017
     private static Gson gson = new GsonBuilder().setDateFormat("MMM yyyy").create();
 
     private static ResourcePathManager instance;
@@ -124,6 +126,7 @@ public abstract class ResourcePathManager {
     /**
      * Load resource from a file-path and turns contents to a objects, of type T, for consumption
      *
+     * @param <T> object type
      * @param context  android context
      * @param clazz    the class of T
      * @param filePath relative file path
@@ -258,6 +261,7 @@ public abstract class ResourcePathManager {
          * Create this Resource into an Object of type T. This method will only work for Json
          * files.
          *
+         * @param <T> object type
          * @param context android context
          * @return object of type T
          */

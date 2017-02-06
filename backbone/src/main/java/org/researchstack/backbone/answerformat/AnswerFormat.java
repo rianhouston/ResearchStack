@@ -23,10 +23,7 @@ import java.io.Serializable;
  * a {@link org.researchstack.backbone.ui.ViewTaskActivity}.
  */
 public abstract class AnswerFormat implements Serializable {
-    /**
-     * Default constructor. The appropriate subclass of AnswerFormat should be used instead of this
-     * directly.
-     */
+    /* Default constructor needed for serilization/deserialization of object */
     public AnswerFormat() {
     }
 

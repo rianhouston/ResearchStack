@@ -2,7 +2,14 @@ package org.researchstack.backbone.result;
 
 import android.net.Uri;
 
+import org.researchstack.backbone.step.QuestionStep;
+import org.researchstack.backbone.step.Step;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,7 +24,8 @@ import java.util.UUID;
  * <p>
  * The <code>results</code> property contains the step results for the task.
  */
-public class TaskResult extends Result {
+public class TaskResult extends Result
+{
     private Map<String, StepResult> results;
 
     // unimplemented but exists in RK, implement or delete if not needed
@@ -26,9 +34,25 @@ public class TaskResult extends Result {
     // unimplemented but exists in RK, implement or delete if not needed
     private Uri outputDirectory;
 
-    public TaskResult(String identifier) {
+    /* Default identifier for serilization/deserialization */
+    TaskResult() {
+        super();
+        this.results = new LinkedHashMap<>();
+    }
+
+    public TaskResult(String identifier)
+    {
         super(identifier);
-        this.results = new HashMap<>();
+        this.results = new LinkedHashMap<>();
+    }
+
+    /**
+     * Set the Map of all of the StepResults in the task.
+     * @param newResults set the results object
+     */
+    public void setResults(Map<String, StepResult> newResults)
+    {
+        results = newResults;
     }
 
     /**
@@ -36,7 +60,8 @@ public class TaskResult extends Result {
      *
      * @return a Map of the StepResults
      */
-    public Map<String, StepResult> getResults() {
+    public Map<String, StepResult> getResults()
+    {
         return results;
     }
 
@@ -44,9 +69,10 @@ public class TaskResult extends Result {
      * Returns a step result for the specified step identifier, if one exists.
      *
      * @param identifier The identifier for which to search.
-     * @return The result for the specified step, or {@link nil} for none.
+     * @return The result for the specified step, or null for none.
      */
-    public StepResult getStepResult(String identifier) {
+    public StepResult getStepResult(String identifier)
+    {
         return results.get(identifier);
     }
 

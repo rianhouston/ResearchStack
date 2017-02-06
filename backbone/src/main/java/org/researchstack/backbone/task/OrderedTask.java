@@ -3,6 +3,7 @@ package org.researchstack.backbone.task;
 import android.content.Context;
 
 import org.researchstack.backbone.R;
+import org.researchstack.backbone.result.StepResult;
 import org.researchstack.backbone.result.TaskResult;
 import org.researchstack.backbone.step.Step;
 import org.researchstack.backbone.utils.TextUtils;
@@ -132,7 +133,7 @@ public class OrderedTask extends Task implements Serializable {
     /**
      * Validates that there are no duplicate identifiers in the list of steps
      *
-     * @throws org.researchstack.backbone.task.Task.InvalidTaskException
+     * @throws org.researchstack.backbone.task.Task.InvalidTaskException if the task is invalid
      */
     @Override
     public void validateParameters() {
