@@ -15,9 +15,6 @@
         android:layout_marginLeft="48dp"
         android:layout_marginRight="48dp"
         android:layout_marginTop="28dp"
-        android:text="@string/rss_eligibility_you_are_eligible"
-        android:textColor="?attr/colorAccent"
-        android:textSize="20sp" />
         android:id="@+id/eligible_text"
     />
 
